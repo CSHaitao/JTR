@@ -38,9 +38,6 @@ class embedding_model(nn.Module):
             node_embedding = self.embedding(offest).reshape(-1,768)
             child_embeddings = node_embedding
 
-            
-
-            ###采样负样本
             negetive = []
             node_father = node_dict[rel_label].parent
             for node_bro in node_father.children:
@@ -118,7 +115,7 @@ class EmbeddingMixin:
 
     def _init_weights(self, module):
         """ Initialize the weights """
-        if isinstance(module, (nn.Linear, nn.Embedding, nn.Conv1d)):  #判断是否是一个已知类型
+        if isinstance(module, (nn.Linear, nn.Embedding, nn.Conv1d)):
             # Slightly different from the TF version which uses truncated_normal for initialization
             # cf https://github.com/pytorch/pytorch/pull/5617
             module.weight.data.normal_(mean=0.0, std=0.02)
@@ -171,7 +168,7 @@ class RobertaDot(BaseModelDot, RobertaPreTrainedModel):
     def __init__(self, config, model_argobj=None):
         BaseModelDot.__init__(self, model_argobj)
         RobertaPreTrainedModel.__init__(self, config)
-        if int(transformers.__version__[0]) ==4 :   ###为啥
+        if int(transformers.__version__[0]) ==4 :  
             config.return_dict = False
         self.roberta = RobertaModel(config, add_pooling_layer=False)
         if hasattr(config, "output_embedding_size"):
@@ -194,7 +191,7 @@ class RobertaDot_4(BaseModelDot, RobertaPreTrainedModel):
     def __init__(self, config, model_argobj=None):
         BaseModelDot.__init__(self, model_argobj)
         RobertaPreTrainedModel.__init__(self, config)
-        if int(transformers.__version__[0]) ==4 :   ###为啥
+        if int(transformers.__version__[0]) ==4 :   
             config.return_dict = False
         self.roberta = RobertaModel(config, add_pooling_layer=False)
         if hasattr(config, "output_embedding_size"):
@@ -249,21 +246,20 @@ def inbatch_train(query_encode_func, doc_encode_func,
     batch_size = query_embs.shape[0]
     with autocast(enabled=False):
         batch_scores = torch.matmul(query_embs, doc_embs.T)
-        # print("batch_scores", batch_scores)
+   
         single_positive_scores = torch.diagonal(batch_scores, 0)
-        # print("positive_scores", positive_scores)
+
         positive_scores = single_positive_scores.reshape(-1, 1).repeat(1, batch_size).reshape(-1)
         if rel_pair_mask is None:
             rel_pair_mask = 1 - torch.eye(batch_size, dtype=batch_scores.dtype, device=batch_scores.device)                
-        # print("mask", mask)
+ 
         batch_scores = batch_scores.reshape(-1)
         logit_matrix = torch.cat([positive_scores.unsqueeze(1),
                                 batch_scores.unsqueeze(1)], dim=1)  
-        # print(logit_matrix)
+     
         lsm = F.log_softmax(logit_matrix, dim=1)
         loss = -1.0 * lsm[:, 0] * rel_pair_mask.reshape(-1)
-        # print(loss)
-        # print("\n")
+
         first_loss, first_num = loss.sum(), rel_pair_mask.sum()
 
     if other_doc_ids is None:
@@ -281,11 +277,10 @@ def inbatch_train(query_encode_func, doc_encode_func,
         positive_scores = single_positive_scores.reshape(-1, 1).repeat(1, other_doc_num).reshape(-1)
         other_logit_matrix = torch.cat([positive_scores.unsqueeze(1),
                                 other_batch_scores.unsqueeze(1)], dim=1)  
-        # print(logit_matrix)
+
         other_lsm = F.log_softmax(other_logit_matrix, dim=1)
         other_loss = -1.0 * other_lsm[:, 0]
-        # print(loss)
-        # print("\n")
+      
         if hard_pair_mask is not None:
             hard_pair_mask = hard_pair_mask.reshape(-1)
             other_loss = other_loss * hard_pair_mask

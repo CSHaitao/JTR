@@ -393,7 +393,7 @@ def tree_update(args):
     tree = load_object(args.raw_tree_path)
     # tree_leaf_dict = load_object(args.leaf_path)
     print(len(tree.leaf_dict))
-    for leaf in tree.leaf_dict:    ##清空pids
+    for leaf in tree.leaf_dict:    
         node = tree.leaf_dict[leaf]
         node.pids = []  
         

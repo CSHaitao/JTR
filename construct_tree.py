@@ -44,8 +44,8 @@ def _node_list(root):
 class TreeNode(object):
     """define the tree node structure."""
     def __init__(self, x ,item_embedding = None, layer = None):
-        self.val = x   #编号  
-        self.embedding = item_embedding  #类中心
+        self.val = x   
+        self.embedding = item_embedding  
         self.parent = None
         self.children = []
         self.isleaf = False
