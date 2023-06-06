@@ -121,7 +121,7 @@ if __name__ == '__main__':
 
     type = "passage"
     max_pid = 1000
-    pass_embedding_dir = f'/{type}/star/passages.memmap' 
+    pass_embedding_dir = f'passages.memmap' 
     
 
     ## build tree
