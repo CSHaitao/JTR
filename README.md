@@ -1,3 +1,10 @@
+<!--
+ * @Author: lihaitao
+ * @Date: 2023-06-07 10:01:54
+ * @LastEditors: Do not edit
+ * @LastEditTime: 2023-06-07 10:01:54
+ * @FilePath: /lht/GitHub_code/JTR/README.md
+-->
 
 # Constructing Tree-based Index for Efficient and Effective Dense Retrieval
 
@@ -7,7 +14,7 @@ The official repo for our SIGIR'23 Full paper: [Constructing Tree-based Index fo
 
 To balance the effectiveness and efficiency of the tree-based indexes, we propose **JTR**, which stands for **J**oint optimization of **TR**ee-based index and query encoding. To jointly optimize index structure and query encoder in an end-to-end manner, JTR drops the original ``encoding-indexing" training paradigm and designs a unified contrastive learning loss. However, training tree-based indexes using contrastive learning loss is non-trivial due to the problem of differentiability. To overcome this obstacle, the tree-based index is divided into two parts: cluster node embeddings and cluster assignment. For differentiable cluster node embeddings, which are small but very critical, we design tree-based negative sampling to optimize them. For cluster assignment, an overlapped cluster method is applied to iteratively optimize it.
 
-![image](./figure/overflow.pdf)
+![image](./figure/overflow.png)
 
 ## Preprocess
 
@@ -15,6 +22,7 @@ JTR initializes the document embeddings with STAR, refer to [DRhard](https://git
 
 
 Run the following codes in DRhard to preprocess document.
+
 ``
 python preprocess.py --data_type 0; python preprocess.py --data_type 1
 ``
@@ -25,15 +33,21 @@ python preprocess.py --data_type 0; python preprocess.py --data_type 1
 After getting the text embeddings, we can initialize the tree using recursive k-means.
 
 Run the following codes:
+
 ``
 python construct_tree.py
 ``
+
 We will get the following files:
 
 tree.pkl: Tree structure
+
 node_dict.pkl: Map of node id to node
+
 node_list: Nodes per level
+
 pid_labelid.memmap: Mapping of document ids to clustering nodes
+
 leaf_dict.pkl: Leaf Nodes
 
 
@@ -48,6 +62,7 @@ The training process trains both the query encoder and the clustering node embed
 ## Inference
 
 Run the following codes:
+
 ``
 python train.py --task dev
 ``
@@ -57,6 +72,7 @@ The inference process can construct the matrix M for Reorganize Cluster.
 ## Reorganize Cluster
 
 Run the following codes:
+
 ``
 python reorganize_clusters_tree.py
 ``
@@ -65,6 +81,7 @@ The re-clustering requires M and Y matrices. Y matrix is constructed by running 
 
 
 ## Other
+
 This work was done when I was a beginner and the code was embarrassing. If somebody can further organize and optimize the code or integrate it into Faiss with C. I would appreciate it.
 
 ## Citations
